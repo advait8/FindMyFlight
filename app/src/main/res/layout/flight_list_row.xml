@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" android:padding="16dp">
+
+    <TextView
+        android:id="@+id/airlineTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="16dp"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/flightNumberTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/airlineTextView"
+        android:layout_below="@+id/airlineTextView"
+        android:text="TextView" />
+
+    <TextView
+        android:id="@+id/flightStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/airlineTextView"
+        android:layout_alignBottom="@+id/airlineTextView"
+        android:layout_alignParentEnd="true"
+        android:text="TextView" />
+</RelativeLayout>
