@@ -1,7 +1,9 @@
-package com.udacity.nanodegree.advait.findmyflight;
+package com.udacity.nanodegree.advait.findmyflight.view;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.udacity.nanodegree.advait.findmyflight.R;
 
 public class LoginActivity extends AppCompatActivity {
 
