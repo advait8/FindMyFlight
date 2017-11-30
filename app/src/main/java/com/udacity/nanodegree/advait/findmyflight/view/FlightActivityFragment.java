@@ -20,6 +20,7 @@ import com.udacity.nanodegree.advait.findmyflight.adapter.FlightListAdapter;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
 import com.udacity.nanodegree.advait.findmyflight.service.ServiceFactory;
+import com.udacity.nanodegree.advait.findmyflight.util.FlightUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,38 +73,35 @@ public class FlightActivityFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        submitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                progressBar.setVisibility(View.VISIBLE);
-                String originAirportCode = originCityText.getText().toString();
-                String destinationAirportCode = destinationCityText.getText().toString();
-                if (!TextUtils.isEmpty(originAirportCode) && !TextUtils.isEmpty(destinationAirportCode)) {
-                    FlightAwareService service = ServiceFactory.createService(FlightAwareService.class, getContext());
-                    service.findFlights(originAirportCode, destinationAirportCode).subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(new Subscriber<JsonObject>() {
-                        @Override
-                        public void onCompleted() {
-                            progressBar.setVisibility(View.GONE);
-                            Log.d("FlightInfoStatusData", "Completed");
-                        }
+        submitButton.setOnClickListener(view -> {
+            progressBar.setVisibility(View.VISIBLE);
+            String originAirportCode = originCityText.getText().toString();
+            String destinationAirportCode = destinationCityText.getText().toString();
+            if (!TextUtils.isEmpty(originAirportCode) && !TextUtils.isEmpty(destinationAirportCode)) {
+                FlightAwareService service = ServiceFactory.createService(FlightAwareService.class, getContext());
+                service.findFlights(originAirportCode, destinationAirportCode,"nonstop").subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<JsonObject>() {
+                    @Override
+                    public void onCompleted() {
+                        progressBar.setVisibility(View.GONE);
+                        Log.d("FlightInfoStatusData", "Completed");
+                    }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.d("FlightInfoStatusData", e.getLocalizedMessage());
-                        }
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d("FlightInfoStatusData", e.getLocalizedMessage());
+                    }
 
-                        @Override
-                        public void onNext(JsonObject flightInfoStatusData) {
-                            try {
-                                processFlightDetails(flightInfoStatusData);
-                            }catch(JSONException exception) {
+                    @Override
+                    public void onNext(JsonObject flightInfoStatusData) {
+                        try {
+                            processFlightDetails(flightInfoStatusData);
+                        }catch(JSONException exception) {
 
-                            }
                         }
-                    });
-                }
+                    }
+                });
             }
         });
 
@@ -124,7 +122,7 @@ public class FlightActivityFragment extends Fragment {
             flightObject.populateData(flightSegmentJsonObject);
             flightList.add(flightObject);
         }
-        flightListAdapter = new FlightListAdapter(flightList);
+        flightListAdapter = new FlightListAdapter(flightList,getContext());
         recyclerView.setAdapter(flightListAdapter);
     }
 

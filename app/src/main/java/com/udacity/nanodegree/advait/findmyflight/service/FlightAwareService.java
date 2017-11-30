@@ -27,10 +27,10 @@ public interface FlightAwareService {
     Observable<AirportInfo> getAirportInfo(@Query("airport_code") String airportCode);
 
     @GET("AircraftType")
-    Observable<AircraftInfo> getAircraftInfo(@Query("type") String aircraftType);
+    Observable<JsonObject> getAircraftInfo(@Query("type") String aircraftType);
 
     @GET("FindFlight")
-    Observable<JsonObject> findFlights(@Query("origin") String origin, @Query("destination") String destination);
+    Observable<JsonObject> findFlights(@Query("origin") String origin, @Query("destination") String destination, @Query("type") String type);
 
 
 }

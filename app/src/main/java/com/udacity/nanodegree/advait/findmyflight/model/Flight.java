@@ -1,6 +1,9 @@
 package com.udacity.nanodegree.advait.findmyflight.model;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
@@ -10,7 +13,7 @@ import org.json.JSONObject;
  * Created by Advait on 8/27/17.
  */
 
-public class Flight {
+public class Flight implements Parcelable{
 
 
     String ident;
@@ -54,6 +57,42 @@ public class Flight {
 
     String flightNumber;
 
+    public Flight(){
+
+    }
+
+    protected Flight(Parcel in) {
+        ident = in.readString();
+        faFlightId = in.readString();
+        airline = in.readString();
+        tailNumber = in.readString();
+        blocked = in.readByte() != 0;
+        diverted = in.readByte() != 0;
+        cancelled = in.readByte() != 0;
+        flightOrigin = in.readParcelable(Location.class.getClassLoader());
+        flightDestination = in.readParcelable(Location.class.getClassLoader());
+        estimatedDepartureTime = in.readParcelable(TimeData.class.getClassLoader());
+        actualDepartureTime = in.readParcelable(TimeData.class.getClassLoader());
+        estimatedArrivalTime = in.readParcelable(TimeData.class.getClassLoader());
+        actualArrivalTime = in.readParcelable(TimeData.class.getClassLoader());
+        filedDepartureTime = in.readParcelable(TimeData.class.getClassLoader());
+        filedArrivalTime = in.readParcelable(TimeData.class.getClassLoader());
+        status = in.readString();
+        aircraftType = in.readString();
+        flightNumber = in.readString();
+    }
+
+    public static final Creator<Flight> CREATOR = new Creator<Flight>() {
+        @Override
+        public Flight createFromParcel(Parcel in) {
+            return new Flight(in);
+        }
+
+        @Override
+        public Flight[] newArray(int size) {
+            return new Flight[size];
+        }
+    };
 
     public String getIdent() {
         return ident;
@@ -218,7 +257,44 @@ public class Flight {
         destinationLocation.populate(destinationJsonObject);
         setFlightDestination(destinationLocation);
 
+        JsonObject filedDepartureTimeJsonObject = flightObject.getAsJsonObject("filed_departure_time");
+        TimeData filedDepartureTime = new TimeData();
+        filedDepartureTime.populateData(filedDepartureTimeJsonObject);
+        setFiledDepartureTime(filedDepartureTime);
+
+        JsonObject filedArrivalTimeJsonObject = flightObject.getAsJsonObject("estimated_arrival_time");
+        TimeData filedArrivalTime = new TimeData();
+        filedArrivalTime.populateData(filedArrivalTimeJsonObject);
+        setEstimatedArrivalTime(filedArrivalTime);
+
         setStatus(flightObject.get("status").getAsString());
         setAircraftType(flightObject.get("aircrafttype").getAsString());
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(ident);
+        parcel.writeString(faFlightId);
+        parcel.writeString(airline);
+        parcel.writeString(tailNumber);
+        parcel.writeByte((byte) (blocked ? 1 : 0));
+        parcel.writeByte((byte) (diverted ? 1 : 0));
+        parcel.writeByte((byte) (cancelled ? 1 : 0));
+        parcel.writeParcelable(flightOrigin, i);
+        parcel.writeParcelable(flightDestination, i);
+        parcel.writeParcelable(estimatedDepartureTime, i);
+        parcel.writeParcelable(actualDepartureTime, i);
+        parcel.writeParcelable(estimatedArrivalTime, i);
+        parcel.writeParcelable(actualArrivalTime, i);
+        parcel.writeParcelable(filedDepartureTime, i);
+        parcel.writeParcelable(filedArrivalTime, i);
+        parcel.writeString(status);
+        parcel.writeString(aircraftType);
+        parcel.writeString(flightNumber);
     }
 }

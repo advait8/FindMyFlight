@@ -5,4 +5,5 @@
     <string name="google_web_client_id" translatable="false">1031273598701-4nsecg5d7r4pc7s08nljmdrm4sn3n9b1.apps.googleusercontent.com</string>
     <string name="flightaware_api_key" translatable="false">2b7da0e7031af4def6af79410df296027b42d8d4</string>
     <string name="flightaware_user_name" translatable="false">advait8</string>
+    <string name="title_activity_flight_details">FlightDetailsActivity</string>
 </resources>

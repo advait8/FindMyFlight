@@ -1,8 +1,4 @@
 package com.udacity.nanodegree.advait.findmyflight.model;
-
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import org.json.JSONObject;
 
 /**

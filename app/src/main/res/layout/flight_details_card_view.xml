@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/colorPrimary"
+    android:layout_centerVertical="true"
+    android:layout_alignParentEnd="true"
+    android:layout_margin="16dp"
+    android:layout_height="match_parent" android:layout_width="match_parent" android:visibility="visible"
+    android:id="@+id/flight_details_layout">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="16dp"
+        android:orientation="vertical" android:layout_marginBottom="16dp">
+        <TextView android:id="@+id/flightNumber" android:layout_height="wrap_content" android:layout_width="wrap_content"
+            android:text="American Airlines # 101"/>
+        <TextView android:id="@+id/aircraftType" android:layout_height="wrap_content" android:layout_width="wrap_content"
+            android:text="Airbus A321"/>
+        <LinearLayout android:baselineAligned="false" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal"
+            android:layout_marginTop="16dp" android:weightSum="2">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent"
+                android:orientation="vertical" android:layout_weight="1" android:layout_marginEnd="16dp">
+                <TextView android:id="@+id/originAirportCode" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="CLT"/>
+                <TextView android:id="@+id/originCity" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="Charlotte-Douglas Intl. Airport"/>
+                <TextView android:id="@+id/departureTime" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="Departure Time" android:layout_marginTop="16dp"/>
+                <TextView android:id="@+id/departureTimeData" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="9:45 PM EST"/>
+                <TextView android:id="@+id/departureDateData" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="10/22/2017"/>
+            </LinearLayout>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent"
+                android:orientation="vertical" android:layout_weight="1">
+                <TextView android:id="@+id/destinationAirportCode" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="JFK"/>
+                <TextView android:id="@+id/destinationCity" android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="John F Kennedy Intl. Airport"/>
+                <TextView android:id="@+id/arrivalTime" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="Arrival Time" android:layout_marginTop="16dp"/>
+                <TextView android:id="@+id/arrivalTimeData" android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:text="11:30 PM EST"/>
+                <TextView android:id="@+id/arrivalDateData" android:layout_height="wrap_content" android:layout_width="wrap_content"
+                    android:text="10/22/2017"/>
+            </LinearLayout>
+        </LinearLayout>
+        <TextView android:id="@+id/status" android:layout_height="wrap_content" android:layout_width="wrap_content"
+            android:text="Status" android:layout_marginTop="16dp"/>
+        <TextView android:id="@+id/statusData" android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="On Time"/>
+        <android.support.design.widget.FloatingActionButton android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:id="@+id/fabButton" android:layout_gravity="end"
+            android:src="@android:drawable/ic_input_add"/>
+    </LinearLayout>
+</android.support.v7.widget.CardView>

@@ -1,5 +1,8 @@
 package com.udacity.nanodegree.advait.findmyflight.adapter;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +12,7 @@ import android.widget.TextView;
 import com.udacity.nanodegree.advait.findmyflight.R;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.util.FlightUtils;
+import com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivity;
 
 import java.util.List;
 
@@ -18,9 +22,10 @@ import java.util.List;
 
 public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.ViewHolder> {
     private List<Flight> flightList;
-
-    public FlightListAdapter(List<Flight> list) {
+    private Context context;
+    public FlightListAdapter(List<Flight> list, Context context) {
         flightList = list;
+        this.context = context;
     }
 
     @Override
@@ -44,7 +49,7 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
         return flightList != null ? flightList.size():0;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView airlineName;
         TextView flightNumber;
         TextView status;
@@ -54,6 +59,17 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
             airlineName = itemView.findViewById(R.id.airlineTextView);
             flightNumber = itemView.findViewById(R.id.flightNumberTextView);
             status = itemView.findViewById(R.id.flightStatus);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Flight flightClicked = flightList.get(getLayoutPosition());
+            Intent intent = new Intent(context,FlightDetailsActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putParcelable("Flight",flightClicked);
+            intent.putExtra("FlightBundle",bundle);
+            context.startActivity(intent);
         }
     }
 }
