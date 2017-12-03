@@ -10,45 +10,45 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="16dp"
         android:orientation="vertical" android:layout_marginBottom="16dp">
         <TextView android:id="@+id/flightNumber" android:layout_height="wrap_content" android:layout_width="wrap_content"
-            android:text="American Airlines # 101"/>
+            android:text="@string/flightNumberHint"/>
         <TextView android:id="@+id/aircraftType" android:layout_height="wrap_content" android:layout_width="wrap_content"
-            android:text="Airbus A321"/>
+            android:text="@string/aircraftTypeHint"/>
         <LinearLayout android:baselineAligned="false" android:layout_width="wrap_content" android:layout_height="match_parent" android:orientation="horizontal"
             android:layout_marginTop="16dp" android:weightSum="2">
             <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent"
                 android:orientation="vertical" android:layout_weight="1" android:layout_marginEnd="16dp">
                 <TextView android:id="@+id/originAirportCode" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="CLT"/>
+                    android:text="@string/airportCodeHint"/>
                 <TextView android:id="@+id/originCity" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="Charlotte-Douglas Intl. Airport"/>
+                    android:text="@string/airportNameHintText"/>
                 <TextView android:id="@+id/departureTime" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="Departure Time" android:layout_marginTop="16dp"/>
+                    android:text="@string/departureTime" android:layout_marginTop="16dp"/>
                 <TextView android:id="@+id/departureTimeData" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="9:45 PM EST"/>
+                    android:text="@string/departureTimeHintText"/>
                 <TextView android:id="@+id/departureDateData" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="10/22/2017"/>
+                    android:text="@string/departureDateHintText"/>
             </LinearLayout>
             <LinearLayout android:layout_width="wrap_content" android:layout_height="match_parent"
                 android:orientation="vertical" android:layout_weight="1">
                 <TextView android:id="@+id/destinationAirportCode" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="JFK"/>
+                    android:text="@string/arrivalAirportCode"/>
                 <TextView android:id="@+id/destinationCity" android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="John F Kennedy Intl. Airport"/>
+                    android:text="@string/arrivalAirportName"/>
                 <TextView android:id="@+id/arrivalTime" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="Arrival Time" android:layout_marginTop="16dp"/>
+                    android:text="@string/arrivalTime" android:layout_marginTop="16dp"/>
                 <TextView android:id="@+id/arrivalTimeData" android:layout_height="wrap_content"
                     android:layout_width="wrap_content"
-                    android:text="11:30 PM EST"/>
+                    android:text="@string/arrivalTimeHintText"/>
                 <TextView android:id="@+id/arrivalDateData" android:layout_height="wrap_content" android:layout_width="wrap_content"
-                    android:text="10/22/2017"/>
+                    android:text="@string/arrivalDateHintText"/>
             </LinearLayout>
         </LinearLayout>
         <TextView android:id="@+id/status" android:layout_height="wrap_content" android:layout_width="wrap_content"
-            android:text="Status" android:layout_marginTop="16dp"/>
+            android:text="@string/flightStatus" android:layout_marginTop="16dp"/>
         <TextView android:id="@+id/statusData" android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:text="On Time"/>
+            android:text="@string/flightStatusHintText"/>
         <android.support.design.widget.FloatingActionButton android:layout_width="match_parent" android:layout_height="wrap_content"
             android:id="@+id/fabButton" android:layout_gravity="end"
             android:src="@android:drawable/ic_input_add"/>

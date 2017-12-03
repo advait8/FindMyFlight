@@ -7,4 +7,23 @@
     <string name="flightaware_user_name" translatable="false">advait8</string>
     <string name="title_activity_flight_details">FlightDetailsActivity</string>
     <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://findmyflight12345.herokuapp.com\",\n  }\n}]</string>
+    <string name="submit">Submit</string>
+    <string name="origin">Origin</string>
+    <string name="destination">Destination</string>
+    <string name="for_example_jfk">For example JFK</string>
+    <string name="for_example_lhr">For example LHR</string>
+    <string name="flightNumberHint">American Airlines # 101</string>
+    <string name="aircraftTypeHint">Airbus A321</string>
+    <string name="airportCodeHint">CLT</string>
+    <string name="airportNameHintText">Charlotte-Douglas Intl. Airport</string>
+    <string name="departureTime">Departure Time</string>
+    <string name="departureTimeHintText">9:45 PM EST</string>
+    <string name="departureDateHintText">10/22/2017</string>
+    <string name="arrivalAirportCode">JFK</string>
+    <string name="arrivalAirportName">John F Kennedy Intl. Airport</string>
+    <string name="arrivalTime">Arrival Time</string>
+    <string name="arrivalTimeHintText">11:30 PM EST</string>
+    <string name="arrivalDateHintText">10/22/2017</string>
+    <string name="flightStatus">Status</string>
+    <string name="flightStatusHintText">On Time</string>
 </resources>
