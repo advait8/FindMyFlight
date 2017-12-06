@@ -103,17 +103,22 @@ public class FlightActivityFragment extends Fragment {
     private void processFlightDetails(JsonObject flightInfoStatusData) throws JSONException {
         List<Flight> flightList = new ArrayList<>();
         JsonObject findFlightResult = flightInfoStatusData.getAsJsonObject("FindFlightResult");
-        JsonArray flightArray = findFlightResult.getAsJsonArray("flights");
-        for(int i=0;i<flightArray.size();i++) {
-            JsonObject flightJsonObject = flightArray.get(i).getAsJsonObject();
-            JsonArray segment = flightJsonObject.getAsJsonArray("segments");
-            JsonObject flightSegmentJsonObject = segment.get(0).getAsJsonObject();
-            Flight flightObject = new Flight();
-            flightObject.populateData(flightSegmentJsonObject);
-            flightList.add(flightObject);
+        if(findFlightResult != null) {
+            JsonArray flightArray = findFlightResult.getAsJsonArray("flights");
+            for (int i = 0; i < flightArray.size(); i++) {
+                JsonObject flightJsonObject = flightArray.get(i).getAsJsonObject();
+                JsonArray segment = flightJsonObject.getAsJsonArray("segments");
+                JsonObject flightSegmentJsonObject = segment.get(0).getAsJsonObject();
+                Flight flightObject = new Flight();
+                flightObject.populateData(flightSegmentJsonObject);
+                flightList.add(flightObject);
+            }
+            flightListAdapter = new FlightListAdapter(flightList, getContext());
+            recyclerView.setAdapter(flightListAdapter);
+        } else {
+            flightListAdapter = new FlightListAdapter(null, getContext());
+            recyclerView.setAdapter(flightListAdapter);
         }
-        flightListAdapter = new FlightListAdapter(flightList,getContext());
-        recyclerView.setAdapter(flightListAdapter);
     }
 
     @Override

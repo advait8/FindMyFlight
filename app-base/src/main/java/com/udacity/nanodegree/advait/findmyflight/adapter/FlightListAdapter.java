@@ -14,6 +14,7 @@ import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.util.FlightUtils;
 import com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,13 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
     private List<Flight> flightList;
     private Context context;
     public FlightListAdapter(List<Flight> list, Context context) {
-        flightList = list;
+        if(list == null) {
+            flightList = new ArrayList<>();
+            Flight noFlight = new Flight();
+            noFlight.setAirline(context.getString(R.string.no_flights_found));
+        } else {
+            flightList = list;
+        }
         this.context = context;
     }
 
@@ -38,10 +45,10 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
 
     @Override
     public void onBindViewHolder(FlightListAdapter.ViewHolder holder, int position) {
-        Flight flight = flightList.get(position);
-        holder.airlineName.setText(flight.getAirline());
-        holder.flightNumber.setText(flight.getIdent());
-        holder.status.setText(flight.getStatus());
+            Flight flight = flightList.get(position);
+            holder.airlineName.setText(flight.getAirline());
+            holder.flightNumber.setText(flight.getIdent());
+            holder.status.setText(flight.getStatus());
     }
 
     @Override

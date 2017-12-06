@@ -1,5 +1,8 @@
 package com.udacity.nanodegree.advait.findmyflight.model;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -32,22 +35,22 @@ public class FlightInfoStatusData{
         this.flights = flights;
     }
 
-    public void populateData(JSONObject flightData) {
-        JSONObject flightInfoJsonObject = flightData.optJSONObject("FlightInfoStatusResult");
+    public void populateData(JsonObject flightData) {
+        JsonObject flightInfoJsonObject = flightData.getAsJsonObject("FlightInfoStatusResult");
         if (flightInfoJsonObject != null) {
-            JSONArray flightsJsonArray = flightInfoJsonObject.optJSONArray("flights");
+            JsonArray flightsJsonArray = flightInfoJsonObject.getAsJsonArray("flights");
             List<Flight> flightList = new ArrayList<>();
-            for (int i = 0; i < flightsJsonArray.length(); i++) {
-                JSONObject flightObject = flightsJsonArray.optJSONObject(i);
-                //Flight flight = new Flight();
-                //flight.populateData(new JsonObject(flightObject.toString()));
-                //flightList.add(flight);
+            for (int i = 0; i < flightsJsonArray.size(); i++) {
+                JsonObject flightObject = flightsJsonArray.get(i).getAsJsonObject();
+                Flight flight = new Flight();
+                flight.populateData(flightObject);
+                flightList.add(flight);
             }
             setFlights(flightList);
         }
     }
 
-    public FlightInfoStatusData(JSONObject jsonObject) {
+    public FlightInfoStatusData(JsonObject jsonObject) {
         populateData(jsonObject);
     }
 }

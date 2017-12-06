@@ -238,7 +238,7 @@ public class Flight implements Parcelable{
         this.filedArrivalTime = filedArrivalTime;
     }
 
-    public void populateData(JsonObject flightObject) throws JSONException {
+    public void populateData(JsonObject flightObject) {
         setIdent(flightObject.get("ident").getAsString());
         setFaFlightId(flightObject.get("faFlightID").getAsString());
         setAirline(flightObject.get("airline").getAsString());
