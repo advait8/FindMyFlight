@@ -17,8 +17,8 @@ import rx.Observable;
 
 public interface FlightAwareService {
     String FLIGHT_AWARE_URL = "https://flightxml.flightaware.com/json/FlightXML3/";
-    @GET("FlightInfoStatusData")
-    Observable<FlightInfoStatusData> getFlights(@Query("ident") String ident);
+    @GET("FlightInfoStatus")
+    Observable<JsonObject> getFlights(@Query("ident") String ident);
 
     @GET("AirlineInfo")
     Observable<AirlineInfo> getAirlineInfo(@Query("airline_code") String airlineCode);

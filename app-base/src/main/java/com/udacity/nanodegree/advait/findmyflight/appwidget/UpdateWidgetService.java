@@ -1,7 +1,9 @@
 package com.udacity.nanodegree.advait.findmyflight.appwidget;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 
@@ -12,12 +14,14 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.model.FlightInfoStatusData;
 import com.udacity.nanodegree.advait.findmyflight.persistence.MyDBHandler;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
 import com.udacity.nanodegree.advait.findmyflight.service.ServiceFactory;
+import com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivity;
 
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -31,7 +35,7 @@ import rx.schedulers.Schedulers;
 public class UpdateWidgetService extends Service {
 
     private static final String TAG = UpdateWidgetService.class.getSimpleName();
-    MyDBHandler myDBHandler;
+
     String currentFlightFaId = null;
 
     @Override
@@ -47,16 +51,10 @@ public class UpdateWidgetService extends Service {
     }
 
     private void updateAppWidget(int incomingAppWidgetId) {
-        myDBHandler = new MyDBHandler(getApplicationContext(), null, null, 1);
         SharedPreferences preferences = getSharedPreferences("FlightNumber", MODE_PRIVATE);
-        String flightIdent = preferences.getString("flightIdent", null);
-        if (!TextUtils.isEmpty(flightIdent)) {
-            currentFlightFaId = myDBHandler.getFlightFaId(flightIdent);
-            if (!TextUtils.isEmpty(currentFlightFaId)) {
-                findFlightDetails(currentFlightFaId, incomingAppWidgetId);
-            } else {
-                findFlightDetails(flightIdent,incomingAppWidgetId);
-            }
+        currentFlightFaId = preferences.getString("flightIdent", null);
+        if (!TextUtils.isEmpty(currentFlightFaId)) {
+            findFlightDetails(currentFlightFaId, incomingAppWidgetId);
         }
     }
 
@@ -67,7 +65,7 @@ public class UpdateWidgetService extends Service {
         RemoteViews remoteViews = new RemoteViews(getApplication().getPackageName(), R.layout.flight_widget_layout);
         FlightAwareService flightAwareService = ServiceFactory.createService(FlightAwareService.class, getApplicationContext());
         flightAwareService.getFlights(flightFAiD).subscribeOn(Schedulers.newThread()).
-                observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<FlightInfoStatusData>() {
+                observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<JsonObject>() {
             @Override
             public void onCompleted() {
                 Log.d("UpdateWidgetService", "Update call completed");
@@ -79,12 +77,13 @@ public class UpdateWidgetService extends Service {
             }
 
             @Override
-            public void onNext(FlightInfoStatusData flightInfoStatusData) {
-                Flight updatedFlight = flightInfoStatusData.getFlights().get(0);
-                remoteViews.setTextViewText(R.id.flightNumber,updatedFlight.getIdent());
-                remoteViews.setTextViewText(R.id.flightStatus,updatedFlight.getStatus());
-                appWidgetManager.updateAppWidget(incomingWidgetId,remoteViews);
-                Log.d("UpdateWidgetService","Widget updated");
+            public void onNext(JsonObject flightInfoStatusData) {
+                FlightInfoStatusData flightInfoStatusData1 = new FlightInfoStatusData(flightInfoStatusData);
+                Flight updatedFlight = flightInfoStatusData1.getFlights().get(0);
+                remoteViews.setTextViewText(R.id.flightNumber, updatedFlight.getIdent());
+                remoteViews.setTextViewText(R.id.flightStatus, updatedFlight.getStatus());
+                appWidgetManager.updateAppWidget(incomingWidgetId, remoteViews);
+                Log.d("UpdateWidgetService", "Widget updated");
             }
         });
     }

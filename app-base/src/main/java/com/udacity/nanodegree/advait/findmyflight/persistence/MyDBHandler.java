@@ -55,10 +55,10 @@ public class MyDBHandler extends SQLiteOpenHelper {
         Log.d("FindMyFlight","Flight record inserted");
     }
 
-    public String getFlightFaId(String flightIdent){
+    public String getFlightFaId(){
         String query = "Select * FROM " + TABLE_FLIGHTS /*+ " WHERE " + COLUMN_NUMBER + " =  \"" + flightIdent + "\""*/;
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(query, null);
         if (cursor.moveToFirst()){
