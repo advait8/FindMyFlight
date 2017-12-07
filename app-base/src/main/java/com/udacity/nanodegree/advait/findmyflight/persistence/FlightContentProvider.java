@@ -1,6 +1,7 @@
 package com.udacity.nanodegree.advait.findmyflight.persistence;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -11,105 +12,125 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.udacity.nanodegree.advait.findmyflight.model.Flight;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
 /**
  * Created by Advait on 12/3/2017.
  */
 
 public class FlightContentProvider extends ContentProvider {
-    private MyDBHandler myDB;
-    private static final String AUTHORITY =
-            "com.udacity.nanodegree.advait.findmyflight.persistence.FlightContentProvider";
-    private static final String FLIGHT_TABLE = "flight";
-    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + FLIGHT_TABLE);
-    public static final int FLIGHTS = 1;
-    public static final int FLIGHTS_ID = 2;
-    private static final UriMatcher sURIMatcher =
-            new UriMatcher(UriMatcher.NO_MATCH);
+    // database
+    private MyDBHandler database;
+
+    // used for the UriMacher
+    private static final int FLIGHTS = 10;
+    private static final int FLIGHT_ID = 20;
+
+    private static final String AUTHORITY = "com.udacity.nanodegree.advait.findmyflight";
+
+    private static final String BASE_PATH = "findmyflight";
+    public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
+            + "/" + BASE_PATH);
+
+    public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+            + "/findmyflight";
+    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+            + "/findmyflight";
+
+    private static final UriMatcher sURIMatcher = new UriMatcher(
+            UriMatcher.NO_MATCH);
 
     static {
-        sURIMatcher.addURI(AUTHORITY, FLIGHT_TABLE, FLIGHTS);
-        sURIMatcher.addURI(AUTHORITY, FLIGHT_TABLE + "/#",
-                FLIGHTS_ID);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH, FLIGHTS);
+        sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", FLIGHT_ID);
     }
+
     @Override
     public boolean onCreate() {
-        myDB = new MyDBHandler(getContext(), null, null, 1);
+        database = new MyDBHandler(getContext());
         return false;
     }
 
-    @Nullable
     @Override
-    public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
+    public Cursor query(Uri uri, String[] projection, String selection,
+                        String[] selectionArgs, String sortOrder) {
+
+        // Uisng SQLiteQueryBuilder instead of query() method
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+        // check if the caller has requested a column which does not exists
+        checkColumns(projection);
+
+        // Set the table
         queryBuilder.setTables(MyDBHandler.TABLE_FLIGHTS);
 
         int uriType = sURIMatcher.match(uri);
-
         switch (uriType) {
-            case FLIGHTS_ID:
-                queryBuilder.appendWhere(MyDBHandler.COLUMN_ID + "="
-                        + uri.getLastPathSegment());
-                break;
             case FLIGHTS:
                 break;
+            case FLIGHT_ID:
+                // adding the ID to the original query
+                queryBuilder.appendWhere(FlightTable.COLUMN_ID + "="
+                        + uri.getLastPathSegment());
+                break;
             default:
-                throw new IllegalArgumentException("Unknown URI");
+                throw new IllegalArgumentException("Unknown URI: " + uri);
         }
 
-        Cursor cursor = queryBuilder.query(myDB.getReadableDatabase(),
-                strings, s, strings1, null, null, s1);
+        SQLiteDatabase db = database.getWritableDatabase();
+        Cursor cursor = queryBuilder.query(db, projection, selection,
+                selectionArgs, null, null, sortOrder);
+        // make sure that potential listeners are getting notified
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
         return cursor;
     }
 
-    @Nullable
     @Override
-    public String getType(@NonNull Uri uri) {
+    public String getType(Uri uri) {
         return null;
     }
 
-    @Nullable
     @Override
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+    public Uri insert(Uri uri, ContentValues values) {
         int uriType = sURIMatcher.match(uri);
-
-        SQLiteDatabase sqlDB = myDB.getWritableDatabase();
-
+        SQLiteDatabase sqlDB = database.getWritableDatabase();
         long id = 0;
         switch (uriType) {
             case FLIGHTS:
-                id = sqlDB.insert(MyDBHandler.TABLE_FLIGHTS,
-                        null, contentValues);
+                id = sqlDB.insert(FlightTable.TABLE_FLIGHTS, null, values);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
         }
         getContext().getContentResolver().notifyChange(uri, null);
-        return Uri.parse(FLIGHT_TABLE + "/" + id);
+        return Uri.parse(BASE_PATH + "/" + id);
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
         int uriType = sURIMatcher.match(uri);
-        SQLiteDatabase sqlDB = myDB.getWritableDatabase();
+        SQLiteDatabase sqlDB = database.getWritableDatabase();
         int rowsDeleted = 0;
-
         switch (uriType) {
             case FLIGHTS:
-                rowsDeleted = sqlDB.delete(MyDBHandler.TABLE_FLIGHTS,
-                        selection,
+                rowsDeleted = sqlDB.delete(FlightTable.TABLE_FLIGHTS, selection,
                         selectionArgs);
                 break;
-
-            case FLIGHTS_ID:
+            case FLIGHT_ID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    rowsDeleted = sqlDB.delete(MyDBHandler.TABLE_FLIGHTS,
-                            MyDBHandler.COLUMN_ID + "=" + id,
+                    rowsDeleted = sqlDB.delete(
+                            FlightTable.TABLE_FLIGHTS,
+                            FlightTable.COLUMN_NUMBER + "=" + id,
                             null);
                 } else {
-                    rowsDeleted = sqlDB.delete(MyDBHandler.TABLE_FLIGHTS,
-                            MyDBHandler.COLUMN_ID + "=" + id
+                    rowsDeleted = sqlDB.delete(
+                            FlightTable.TABLE_FLIGHTS,
+                            FlightTable.COLUMN_NUMBER + "=" + id
                                     + " and " + selection,
                             selectionArgs);
                 }
@@ -122,34 +143,33 @@ public class FlightContentProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
-        int uriType = sURIMatcher.match(uri);
-        SQLiteDatabase sqlDB = myDB.getWritableDatabase();
-        int rowsUpdated = 0;
+    public int update(Uri uri, ContentValues values, String selection,
+                      String[] selectionArgs) {
 
+        int uriType = sURIMatcher.match(uri);
+        SQLiteDatabase sqlDB = database.getWritableDatabase();
+        int rowsUpdated = 0;
         switch (uriType) {
             case FLIGHTS:
-                rowsUpdated = sqlDB.update(MyDBHandler.TABLE_FLIGHTS,
+                rowsUpdated = sqlDB.update(FlightTable.TABLE_FLIGHTS,
                         values,
                         selection,
                         selectionArgs);
                 break;
-            case FLIGHTS_ID:
+            case FLIGHT_ID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    rowsUpdated =
-                            sqlDB.update(MyDBHandler.TABLE_FLIGHTS,
-                                    values,
-                                    MyDBHandler.COLUMN_ID + "=" + id,
-                                    null);
+                    rowsUpdated = sqlDB.update(FlightTable.TABLE_FLIGHTS,
+                            values,
+                            FlightTable.COLUMN_NUMBER + "=" + id,
+                            null);
                 } else {
-                    rowsUpdated =
-                            sqlDB.update(MyDBHandler.TABLE_FLIGHTS,
-                                    values,
-                                    MyDBHandler.COLUMN_ID + "=" + id
-                                            + " and "
-                                            + selection,
-                                    selectionArgs);
+                    rowsUpdated = sqlDB.update(FlightTable.TABLE_FLIGHTS,
+                            values,
+                            FlightTable.COLUMN_NUMBER + "=" + id
+                                    + " and "
+                                    + selection,
+                            selectionArgs);
                 }
                 break;
             default:
@@ -158,4 +178,21 @@ public class FlightContentProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
         return rowsUpdated;
     }
+
+    private void checkColumns(String[] projection) {
+        String[] available = {FlightTable.COLUMN_ID, FlightTable.COLUMN_FLIGHT_FA_ID, FlightTable.COLUMN_ID};
+        if (projection != null) {
+            HashSet<String> requestedColumns = new HashSet<String>(
+                    Arrays.asList(projection));
+            HashSet<String> availableColumns = new HashSet<String>(
+                    Arrays.asList(available));
+            // check if all columns which are requested are available
+            if (!availableColumns.containsAll(requestedColumns)) {
+                throw new IllegalArgumentException(
+                        "Unknown columns in projection");
+            }
+        }
+    }
+
 }
+

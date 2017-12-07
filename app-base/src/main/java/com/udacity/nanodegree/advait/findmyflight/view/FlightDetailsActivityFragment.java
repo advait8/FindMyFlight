@@ -73,6 +73,7 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dbHandler = new MyDBHandler(getContext(), null, null, 1);
         boolean accessedFromWidget = getActivity().getIntent().getBooleanExtra("WidgetExtra", false);
         if (accessedFromWidget) {
             getActivity().getSupportLoaderManager().initLoader(0, null, this).forceLoad();
@@ -107,7 +108,6 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         if (currentFlight != null) {
             setupFlightView();
         }
-        dbHandler = new MyDBHandler(getContext(), null, null, 1);
     }
 
     private void setupFlightView() {
@@ -233,8 +233,11 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
 
         @Override
         public Flight loadInBackground() {
-            SharedPreferences preferences = getContext().getSharedPreferences("FlightNumber", MODE_PRIVATE);
-            String flightFaId = preferences.getString("flightIdent", null);
+            if (dbHandler == null) {
+                dbHandler = new MyDBHandler(fragment.getContext());
+            }
+            String flightFaId = dbHandler.getFlightFaId();
+//            Log.d("OnClickWidget", flightFaId);
             FlightAwareService flightAwareService = ServiceFactory.createService(FlightAwareService.class, getContext());
             flightAwareService.getFlights(flightFaId).subscribeOn(Schedulers.newThread()).
                     observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<JsonObject>() {
