@@ -33,25 +33,25 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="findmyflight12345.herokuapp.com"
-                    android:pathPattern="/findmyflight" />
+                    android:pathPattern="/findmyflight"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
             android:name="com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivity"
             android:label="@string/title_activity_flight_details"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <provider
-            android:name="com.udacity.nanodegree.advait.findmyflight.persistence.FlightContentProvider"
-            android:authorities="com.udacity.nanodegree.advait.findmyflight.persistence.FlightContentProvider"
-            />
-        <service android:name=".appwidget.UpdateWidgetService"/>
+            android:name=".persistence.FlightDataContentProvider"
+            android:authorities="com.udacity.nanodegree.advait.findmyflight.provider.Flights" />
+        <service android:name=".appwidget.UpdateWidgetService" />
         <receiver
+            android:name=".appwidget.FlightWidgetProvider"
             android:icon="@android:drawable/ic_dialog_info"
-            android:label="Find My Flight Widget"
-            android:name=".appwidget.FlightWidgetProvider" >
-            <intent-filter >
+            android:label="Find My Flight Widget">
+            <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 

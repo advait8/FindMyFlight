@@ -13,7 +13,7 @@ import org.json.JSONObject;
  * Created by Advait on 8/27/17.
  */
 
-public class Flight implements Parcelable{
+public class Flight implements Parcelable {
 
 
     String ident;
@@ -57,7 +57,9 @@ public class Flight implements Parcelable{
 
     String flightNumber;
 
-    public Flight(){
+    boolean restoredFromDB;
+
+    public Flight() {
 
     }
 
@@ -80,6 +82,7 @@ public class Flight implements Parcelable{
         status = in.readString();
         aircraftType = in.readString();
         flightNumber = in.readString();
+        restoredFromDB = in.readByte() != 0;
     }
 
     public static final Creator<Flight> CREATOR = new Creator<Flight>() {
@@ -238,6 +241,14 @@ public class Flight implements Parcelable{
         this.filedArrivalTime = filedArrivalTime;
     }
 
+    public boolean isRestoredFromDB() {
+        return restoredFromDB;
+    }
+
+    public void setRestoredFromDB(boolean isRestoredFromDb) {
+        restoredFromDB = isRestoredFromDb;
+    }
+
     public void populateData(JsonObject flightObject) {
         setIdent(flightObject.get("ident").getAsString());
         setFaFlightId(flightObject.get("faFlightID").getAsString());
@@ -296,5 +307,6 @@ public class Flight implements Parcelable{
         parcel.writeString(status);
         parcel.writeString(aircraftType);
         parcel.writeString(flightNumber);
+        parcel.writeByte((byte) (restoredFromDB ? 1 : 0));
     }
 }

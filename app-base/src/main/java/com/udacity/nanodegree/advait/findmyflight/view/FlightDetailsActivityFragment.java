@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,7 @@ import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
 import com.udacity.nanodegree.advait.findmyflight.model.Airline;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
-import com.udacity.nanodegree.advait.findmyflight.persistence.MyDBHandler;
+
 import com.udacity.nanodegree.advait.findmyflight.service.FindMyFlightService;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
 import com.udacity.nanodegree.advait.findmyflight.service.ServiceFactory;
@@ -58,8 +59,6 @@ public class FlightDetailsActivityFragment extends Fragment {
 
     FloatingActionButton fabButton;
 
-    MyDBHandler dbHandler;
-
     public FlightDetailsActivityFragment() {
     }
 
@@ -92,11 +91,14 @@ public class FlightDetailsActivityFragment extends Fragment {
             findAircraftDetails(currentFlight.getAircraftType(), this.getContext());
             setupCardView();
         }
-        dbHandler = new MyDBHandler(getContext(), null, null, 1);
     }
 
     private void setupCardView() {
-        originAirportCode.setText(currentFlight.getFlightOrigin().getAlternateIdent());
+        if (!TextUtils.isEmpty(currentFlight.getFlightOrigin().getAlternateIdent())) {
+            originAirportCode.setText(currentFlight.getFlightOrigin().getAlternateIdent());
+        } else {
+            originAirportCode.setText(currentFlight.getFlightOrigin().getAirportCode());
+        }
         originCity.setText(currentFlight.getFlightOrigin().getCity());
         destinationAirportCode.setText(currentFlight.getFlightDestination().getAlternateIdent());
         destinationCity.setText(currentFlight.getFlightDestination().getCity());
@@ -106,7 +108,7 @@ public class FlightDetailsActivityFragment extends Fragment {
         arrivalDate.setText(currentFlight.getEstimatedArrivalTime().getDate());
         statusData.setText(currentFlight.getStatus());
         fabButton.setOnClickListener(view -> {
-            if(InstantApps.isInstantApp(getContext())) {
+            if (InstantApps.isInstantApp(getContext())) {
                 redirectToGooglePlayStore();
             } else {
                 storeData();
@@ -114,19 +116,16 @@ public class FlightDetailsActivityFragment extends Fragment {
         });
     }
 
-    private void redirectToGooglePlayStore(){
+    private void redirectToGooglePlayStore() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("http://play.google.com/store/apps/collection/topselling_free"));
         startActivity(intent);
     }
 
     private void storeData() {
-        SharedPreferences preferences = getActivity().getSharedPreferences("FlightNumber",Context.MODE_PRIVATE);
+        SharedPreferences preferences = getActivity().getSharedPreferences("FlightNumber", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("flightIdent",currentFlight.getIdent()).commit();
-        if (dbHandler != null) {
-            dbHandler.addFlight(currentFlight);
-        }
+        editor.putString("flightIdent", currentFlight.getFaFlightId()).commit();
     }
 
     private void findAirlineDetails(String icaoCode, Context context) {
@@ -176,7 +175,7 @@ public class FlightDetailsActivityFragment extends Fragment {
                 aircraftType.setText(
                         jsonObject.get("AircraftTypeResult").
                                 getAsJsonObject().get("manufacturer").getAsString()
-                        + " " + jsonObject.get("AircraftTypeResult").
+                                + " " + jsonObject.get("AircraftTypeResult").
                                 getAsJsonObject().get("type").getAsString());
             }
         });

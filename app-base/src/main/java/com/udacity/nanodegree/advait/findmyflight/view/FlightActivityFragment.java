@@ -1,5 +1,7 @@
 package com.udacity.nanodegree.advait.findmyflight.view;
 
+import android.content.CursorLoader;
+import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,9 +20,12 @@ import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
 import com.udacity.nanodegree.advait.findmyflight.adapter.FlightListAdapter;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
+import com.udacity.nanodegree.advait.findmyflight.persistence.FlightDataContentProvider;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
 import com.udacity.nanodegree.advait.findmyflight.service.ServiceFactory;
+
 import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,41 +74,66 @@ public class FlightActivityFragment extends Fragment {
             String destinationAirportCode = destinationCityText.getText().toString();
             if (!TextUtils.isEmpty(originAirportCode) && !TextUtils.isEmpty(destinationAirportCode)) {
                 FlightAwareService service = ServiceFactory.createService(FlightAwareService.class, getContext());
-                service.findFlights(originAirportCode, destinationAirportCode,"nonstop").subscribeOn(Schedulers.newThread())
+                service.findFlights(originAirportCode, destinationAirportCode, "nonstop").subscribeOn(Schedulers.newThread())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Subscriber<JsonObject>() {
-                    @Override
-                    public void onCompleted() {
-                        progressBar.setVisibility(View.GONE);
-                        Log.d("FlightInfoStatusData", "Completed");
-                    }
+                            @Override
+                            public void onCompleted() {
+                                progressBar.setVisibility(View.GONE);
+                                Log.d("FlightInfoStatusData", "Completed");
+                            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.d("FlightInfoStatusData", e.getLocalizedMessage());
-                    }
+                            @Override
+                            public void onError(Throwable e) {
+                                Log.d("FlightInfoStatusData", e.getLocalizedMessage());
+                            }
 
-                    @Override
-                    public void onNext(JsonObject flightInfoStatusData) {
-                        try {
-                            processFlightDetails(flightInfoStatusData);
-                        }catch(JSONException exception) {
+                            @Override
+                            public void onNext(JsonObject flightInfoStatusData) {
+                                try {
+                                    processFlightDetails(flightInfoStatusData);
+                                } catch (JSONException exception) {
 
-                        }
-                    }
-                });
+                                }
+                            }
+                        });
             }
         });
-
+        ArrayList<Flight> listOfPastSearchedFlights = retrievePastClickedFLights();
+        flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext());
+        recyclerView.setAdapter(flightListAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
     }
 
+    private ArrayList<Flight> retrievePastClickedFLights() {
+        ArrayList<Flight> listOfPastClickedFlights = new ArrayList<>();
+        Cursor c;
+        CursorLoader cursorLoader = new CursorLoader(getContext(),
+                FlightDataContentProvider.CONTENT_URI,
+                null, null, null, "_id desc");
+        c = cursorLoader.loadInBackground();
+        if (c != null && c.moveToFirst()) {
+            do {
+                Flight tempFlight = new Flight();
+                tempFlight.setIdent(c.getString(c.getColumnIndex(FlightDataContentProvider
+                        .FLIGHT_NUMBER)));
+                tempFlight.setFaFlightId(c.getString(c.getColumnIndex(FlightDataContentProvider
+                        .FLIGHT_FA_ID)));
+                tempFlight.setStatus(c.getString(c.getColumnIndex(FlightDataContentProvider
+                        .FLIGHT_STATUS)));
+                tempFlight.setRestoredFromDB(true);
+                listOfPastClickedFlights.add(tempFlight);
+            } while (c.moveToNext());
+        }
+        return listOfPastClickedFlights;
+    }
+
     private void processFlightDetails(JsonObject flightInfoStatusData) throws JSONException {
         List<Flight> flightList = new ArrayList<>();
         JsonObject findFlightResult = flightInfoStatusData.getAsJsonObject("FindFlightResult");
-        if(findFlightResult != null) {
+        if (findFlightResult != null) {
             JsonArray flightArray = findFlightResult.getAsJsonArray("flights");
             for (int i = 0; i < flightArray.size(); i++) {
                 JsonObject flightJsonObject = flightArray.get(i).getAsJsonObject();
