@@ -1,7 +1,14 @@
 package com.udacity.nanodegree.advait.findmyflight.appwidget;
 
+
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;
+
+import android.app.PendingIntent;
+import android.app.Service;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
@@ -16,6 +23,7 @@ import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.model.FlightInfoStatusData;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
 import com.udacity.nanodegree.advait.findmyflight.service.ServiceFactory;
+import com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivity;
 
 
 import rx.Subscriber;
@@ -30,6 +38,7 @@ import rx.schedulers.Schedulers;
 public class UpdateWidgetService extends IntentService {
 
     private static final String TAG = UpdateWidgetService.class.getSimpleName();
+
     String currentFlightFaId = null;
 
     public UpdateWidgetService(){
@@ -42,6 +51,7 @@ public class UpdateWidgetService extends IntentService {
 
     private void updateAppWidget(int incomingAppWidgetId) {
         SharedPreferences preferences = getSharedPreferences("FlightNumber", MODE_PRIVATE);
+
         String flightIdent = preferences.getString("flightIdent", null);
         if (!TextUtils.isEmpty(flightIdent)) {
             findFlightDetails(flightIdent, incomingAppWidgetId);

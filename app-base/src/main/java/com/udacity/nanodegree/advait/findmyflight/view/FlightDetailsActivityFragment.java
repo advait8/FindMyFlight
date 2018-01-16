@@ -4,10 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +23,7 @@ import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
 import com.udacity.nanodegree.advait.findmyflight.model.Airline;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
-
+import com.udacity.nanodegree.advait.findmyflight.model.FlightInfoStatusData;
 import com.udacity.nanodegree.advait.findmyflight.service.FindMyFlightService;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
 import com.udacity.nanodegree.advait.findmyflight.service.ServiceFactory;
@@ -28,12 +32,14 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * A fragment to display flight details.
  */
-public class FlightDetailsActivityFragment extends Fragment {
+public class FlightDetailsActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Flight> {
     private Airline currentAirline;
-    private Flight currentFlight;
+    private static Flight currentFlight;
 
     TextView flightNumber;
 
@@ -63,10 +69,20 @@ public class FlightDetailsActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        boolean accessedFromWidget = getActivity().getIntent().getBooleanExtra("WidgetExtra", false);
+        if (accessedFromWidget) {
+            getActivity().getSupportLoaderManager().initLoader(0, null, this).forceLoad();
+        } else {
+            Bundle bundle = getActivity().getIntent().getBundleExtra("FlightBundle");
+            currentFlight = bundle.getParcelable("Flight");
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Bundle bundle = getActivity().getIntent().getBundleExtra("FlightBundle");
-        currentFlight = bundle.getParcelable("Flight");
         View view = inflater.inflate(R.layout.fragment_flight_details, container, false);
         flightNumber = view.findViewById(R.id.flightNumber);
         aircraftType = view.findViewById(R.id.aircraftType);
@@ -87,10 +103,15 @@ public class FlightDetailsActivityFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (currentFlight != null) {
-            findAirlineDetails(currentFlight.getAirline(), this.getContext());
-            findAircraftDetails(currentFlight.getAircraftType(), this.getContext());
-            setupCardView();
+            setupFlightView();
         }
+
+    }
+
+    private void setupFlightView() {
+        findAirlineDetails(currentFlight.getAirline(), this.getContext());
+        findAircraftDetails(currentFlight.getAircraftType(), this.getContext());
+        setupCardView();
     }
 
     private void setupCardView() {
@@ -123,7 +144,7 @@ public class FlightDetailsActivityFragment extends Fragment {
     }
 
     private void storeData() {
-        SharedPreferences preferences = getActivity().getSharedPreferences("FlightNumber", Context.MODE_PRIVATE);
+        SharedPreferences preferences = getActivity().getSharedPreferences("FlightNumber", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("flightIdent", currentFlight.getFaFlightId()).commit();
     }
@@ -184,5 +205,61 @@ public class FlightDetailsActivityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    @Override
+    public Loader<Flight> onCreateLoader(int id, Bundle args) {
+        return new FetchData(getContext(), this);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Flight> loader, Flight flight) {
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Flight> loader) {
+
+    }
+
+    private static class FetchData extends AsyncTaskLoader<Flight> {
+        Flight tempFlight;
+        FlightDetailsActivityFragment fragment;
+
+        public FetchData(Context context, FlightDetailsActivityFragment fragment) {
+            super(context);
+            this.fragment = fragment;
+        }
+
+        @Override
+        public Flight loadInBackground() {
+            SharedPreferences preferences = getContext().getSharedPreferences("FlightNumber",
+                    MODE_PRIVATE);
+
+            String flightIdent = preferences.getString("flightIdent", null);
+//            Log.d("OnClickWidget", flightFaId);
+            FlightAwareService flightAwareService = ServiceFactory.createService(FlightAwareService.class, getContext());
+            flightAwareService.getFlights(flightIdent).subscribeOn(Schedulers.newThread()).
+                    observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<JsonObject>() {
+                @Override
+                public void onCompleted() {
+                    Log.d("Loader", "Fetching data completed.");
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    Log.d("Loader", e.getLocalizedMessage());
+                }
+
+                @Override
+                public void onNext(JsonObject jsonObject) {
+                    FlightInfoStatusData flightInfoStatusData1 = new FlightInfoStatusData(jsonObject);
+                    currentFlight = flightInfoStatusData1.getFlights().get(0);
+                    tempFlight = currentFlight;
+                    Log.d("Loader", currentFlight.getIdent());
+                    fragment.setupFlightView();
+                }
+            });
+            return tempFlight;
+        }
     }
 }
