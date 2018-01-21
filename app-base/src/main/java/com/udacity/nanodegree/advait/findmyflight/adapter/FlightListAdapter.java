@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ import com.udacity.nanodegree.advait.findmyflight.model.FlightInfoStatusData;
 import com.udacity.nanodegree.advait.findmyflight.persistence.FlightDataContentProvider;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
 import com.udacity.nanodegree.advait.findmyflight.service.ServiceFactory;
+import com.udacity.nanodegree.advait.findmyflight.view.FlightActivityFragment;
 import com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivity;
 
 import java.util.ArrayList;
@@ -36,8 +39,10 @@ import rx.schedulers.Schedulers;
 public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.ViewHolder> {
     private List<Flight> flightList;
     private Context context;
+    private ProgressBar progressBar;
+    private RecyclerView recyclerView;
 
-    public FlightListAdapter(List<Flight> list, Context context) {
+    public FlightListAdapter(List<Flight> list, Context context, RecyclerView rView) {
         if (list == null) {
             flightList = new ArrayList<>();
             Flight noFlight = new Flight();
@@ -45,7 +50,9 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
         } else {
             flightList = list;
         }
+
         this.context = context;
+        this.recyclerView = rView;
     }
 
     @Override
@@ -86,6 +93,9 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
         public void onClick(View view) {
             Flight flightClicked = flightList.get(getLayoutPosition());
             if (flightClicked.isRestoredFromDB()) {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.VISIBLE);
+                }
                 FlightAwareService flightAwareService = ServiceFactory.createService
                         (FlightAwareService.class, context);
                 flightAwareService.getFlights(flightClicked.getIdent()).subscribeOn(Schedulers
@@ -93,12 +103,17 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
                         observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<JsonObject>() {
                     @Override
                     public void onCompleted() {
-                        Log.d("UpdateWidgetService", "Update call completed");
+                        if (progressBar != null && progressBar.getVisibility() == View.VISIBLE) {
+                            progressBar.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d("onError", e.getLocalizedMessage());
+                        Snackbar snackbar = Snackbar.make(recyclerView, context.getString(R.string
+                                        .api_error_generic_response),
+                                Snackbar.LENGTH_LONG);
+                        snackbar.show();
                     }
 
                     @Override
@@ -135,5 +150,9 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
         Uri uri = context.getContentResolver().insert(FlightDataContentProvider.CONTENT_URI,
                 contentValues);
         Toast.makeText(context, uri.toString(), Toast.LENGTH_LONG).show();
+    }
+
+    public void setProgressBar(ProgressBar progressBar) {
+        this.progressBar = progressBar;
     }
 }

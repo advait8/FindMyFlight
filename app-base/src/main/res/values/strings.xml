@@ -27,4 +27,5 @@
     <string name="flightStatus">Status</string>
     <string name="flightStatusHintText">On Time</string>
     <string name="no_flights_found">No flights found</string>
+    <string name="api_error_generic_response">There was a problem with our service. Please try again later.</string>
 </resources>

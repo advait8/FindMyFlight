@@ -166,6 +166,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
             @Override
             public void onError(Throwable e) {
                 currentAirline = null;
+                flightNumber.setText(currentFlight.getAirline()+ " "+"\n(" + currentFlight
+                        .getIdent() + ")");
                 Log.d("onError", e.getLocalizedMessage());
             }
 

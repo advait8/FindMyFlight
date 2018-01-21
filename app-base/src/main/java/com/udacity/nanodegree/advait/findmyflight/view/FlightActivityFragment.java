@@ -2,18 +2,20 @@ package com.udacity.nanodegree.advait.findmyflight.view;
 
 import android.content.CursorLoader;
 import android.database.Cursor;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -48,7 +50,11 @@ public class FlightActivityFragment extends Fragment {
 
     ProgressBar progressBar;
 
+    TextView title;
+
     private FlightListAdapter flightListAdapter;
+
+    ImageView clearButton;
 
     public FlightActivityFragment() {
     }
@@ -57,11 +63,13 @@ public class FlightActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_flight, container, false);
-        originCityText = view.findViewById(R.id.editText);
-        destinationCityText = view.findViewById(R.id.editText2);
-        submitButton = view.findViewById(R.id.button);
+        originCityText = view.findViewById(R.id.originAirportEditText);
+        destinationCityText = view.findViewById(R.id.destinationAirportEditText);
+        submitButton = view.findViewById(R.id.submitButton);
         progressBar = view.findViewById(R.id.progressBar);
         recyclerView = view.findViewById(R.id.recyclerView);
+        title = view.findViewById(R.id.recyclerViewTitle);
+        clearButton = view.findViewById(R.id.imageView2);
         return view;
     }
 
@@ -80,12 +88,16 @@ public class FlightActivityFragment extends Fragment {
                             @Override
                             public void onCompleted() {
                                 progressBar.setVisibility(View.GONE);
-                                Log.d("FlightInfoStatusData", "Completed");
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                Log.d("FlightInfoStatusData", e.getLocalizedMessage());
+                                originCityText.setText("");
+                                destinationCityText.setText("");
+                                Snackbar snackbar = Snackbar.make(FlightActivityFragment.this
+                                                .getView(), getString(R.string.api_error_generic_response),
+                                        Snackbar.LENGTH_LONG);
+                                snackbar.show();
                             }
 
                             @Override
@@ -99,8 +111,20 @@ public class FlightActivityFragment extends Fragment {
                         });
             }
         });
+
+        clearButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                getContext().getContentResolver().delete(FlightDataContentProvider.CONTENT_URI,
+                        null,null);
+                ArrayList<Flight> listOfPastSearchedFlights = retrievePastClickedFLights();
+                flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext(), recyclerView);
+                recyclerView.setAdapter(flightListAdapter);
+            }
+        });
         ArrayList<Flight> listOfPastSearchedFlights = retrievePastClickedFLights();
-        flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext());
+        title.setText("Recently searched flights");
+        flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext(), recyclerView);
         recyclerView.setAdapter(flightListAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -133,6 +157,7 @@ public class FlightActivityFragment extends Fragment {
     private void processFlightDetails(JsonObject flightInfoStatusData) throws JSONException {
         List<Flight> flightList = new ArrayList<>();
         JsonObject findFlightResult = flightInfoStatusData.getAsJsonObject("FindFlightResult");
+        title.setText("Search results");
         if (findFlightResult != null) {
             JsonArray flightArray = findFlightResult.getAsJsonArray("flights");
             for (int i = 0; i < flightArray.size(); i++) {
@@ -143,10 +168,10 @@ public class FlightActivityFragment extends Fragment {
                 flightObject.populateData(flightSegmentJsonObject);
                 flightList.add(flightObject);
             }
-            flightListAdapter = new FlightListAdapter(flightList, getContext());
+            flightListAdapter = new FlightListAdapter(flightList, getContext(), recyclerView);
             recyclerView.setAdapter(flightListAdapter);
         } else {
-            flightListAdapter = new FlightListAdapter(null, getContext());
+            flightListAdapter = new FlightListAdapter(null, getContext(), recyclerView);
             recyclerView.setAdapter(flightListAdapter);
         }
     }

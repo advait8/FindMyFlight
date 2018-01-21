@@ -29,6 +29,7 @@ public class FlightDataContentProvider extends ContentProvider {
 
 
     private static final UriMatcher uriMatcher;
+    public static final String FLIGHT_TYPE_CONSTANT = "vnd.android.cursor.dir/vnd.udacity.nanodegree.advait.findmyflight.flights";
 
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -64,8 +65,7 @@ public class FlightDataContentProvider extends ContentProvider {
     public String getType(Uri uri) {
         switch (uriMatcher.match(uri)) {
             case FLIGHTS:
-                return "vnd.android.cursor.dir/vnd.udacity.nanodegree.advait.findmyflight" +
-                        ".flights";
+                return FLIGHT_TYPE_CONSTANT;
             default:
                 throw new IllegalArgumentException("Unsupported URI:" + uri);
         }
@@ -84,8 +84,18 @@ public class FlightDataContentProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+    public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[]
+            selectionArgs) {
+       int count = 0;
+       switch (uriMatcher.match(uri)) {
+           case FLIGHTS:
+               count = flightsDB.delete(DATABASE_TABLE,selection,selectionArgs);
+               break;
+           default:
+               throw new IllegalArgumentException("Unknown URI:" + uri);
+       }
+       getContext().getContentResolver().notifyChange(uri,null);
+       return count;
     }
 
     @Override
@@ -108,7 +118,7 @@ public class FlightDataContentProvider extends ContentProvider {
         SQLiteQueryBuilder sqlBuilder = new SQLiteQueryBuilder();
         sqlBuilder.setTables(DATABASE_TABLE);
 
-        Cursor c = sqlBuilder.query(flightsDB,projection,selection,selectionArgs,null,null,
+        Cursor c = sqlBuilder.query(flightsDB, projection, selection, selectionArgs, null, null,
                 sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;
