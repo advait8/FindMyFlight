@@ -3,9 +3,6 @@ package com.udacity.nanodegree.advait.findmyflight.model;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 

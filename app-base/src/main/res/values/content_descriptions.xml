@@ -16,4 +16,5 @@
         from widget</string>
     <string name="cd_stop_track_flight_button">Click this button to stop tracking the
         flight from widget</string>
+    <string name="cd_widget_action_button">Click here to update the widget</string>
 </resources>

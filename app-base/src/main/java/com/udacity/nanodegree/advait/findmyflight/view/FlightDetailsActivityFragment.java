@@ -1,5 +1,7 @@
 package com.udacity.nanodegree.advait.findmyflight.view;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,6 +28,7 @@ import com.google.android.instantapps.InstantApps;
 import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
 import com.udacity.nanodegree.advait.findmyflight.analytics.FirebaseAnalyticsHelper;
+import com.udacity.nanodegree.advait.findmyflight.appwidget.FlightWidgetProvider;
 import com.udacity.nanodegree.advait.findmyflight.model.Airline;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.model.FlightInfoStatusData;
@@ -186,6 +189,7 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         fabButton.setImageDrawable(ContextCompat.getDrawable(getContext(), android.R.drawable.ic_delete));
         eventBundle.putString("FindMyFlight", getString(R.string.fbase_event_start_flight_track));
         FirebaseAnalyticsHelper.setEvent("FlightDetails", eventBundle, getContext());
+        updateAppWidget();
     }
 
     private void deleteData() {
@@ -197,6 +201,7 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         fabButton.setImageDrawable(ContextCompat.getDrawable(getContext(), android.R.drawable.ic_input_add));
         eventBundle.putString("FindMyFlight", getString(R.string.fbase_event_stop_tracking_flight));
         FirebaseAnalyticsHelper.setEvent("FlightDetails", eventBundle, getContext());
+        updateAppWidget();
     }
 
     private void findAirlineDetails(String icaoCode, Context context) {
@@ -327,5 +332,14 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
             });
             return tempFlight;
         }
+    }
+
+    private void updateAppWidget() {
+        Intent intent = new Intent(getContext(), FlightWidgetProvider.class);
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(getContext()).getAppWidgetIds(new
+                ComponentName(getContext(), FlightWidgetProvider.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        getContext().sendBroadcast(intent);
     }
 }

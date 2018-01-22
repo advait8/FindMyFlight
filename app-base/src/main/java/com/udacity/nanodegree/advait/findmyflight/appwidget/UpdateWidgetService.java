@@ -39,7 +39,7 @@ public class UpdateWidgetService extends IntentService {
 
     private static final String TAG = UpdateWidgetService.class.getSimpleName();
 
-    public UpdateWidgetService(){
+    public UpdateWidgetService() {
         super("UpdateWidgetService");
     }
 
@@ -52,7 +52,18 @@ public class UpdateWidgetService extends IntentService {
         String flightIdent = preferences.getString("flightIdent", null);
         if (!TextUtils.isEmpty(flightIdent)) {
             findFlightDetails(flightIdent, incomingAppWidgetId);
+        } else {
+            showEmptyWidget(incomingAppWidgetId);
         }
+    }
+
+    private void showEmptyWidget(int incomingAppWidgetId) {
+        AppWidgetManager appWidgetManager = AppWidgetManager
+                .getInstance(getApplicationContext());
+        RemoteViews remoteViews = new RemoteViews(getApplication().getPackageName(), R.layout.flight_widget_layout);
+        remoteViews.setTextViewText(R.id.flightNumber, getString(R.string.widget_open_app_text));
+        remoteViews.setTextViewText(R.id.flightStatus, "");
+        appWidgetManager.updateAppWidget(incomingAppWidgetId, remoteViews);
     }
 
     private void findFlightDetails(String flightFAiD, int incomingWidgetId) {

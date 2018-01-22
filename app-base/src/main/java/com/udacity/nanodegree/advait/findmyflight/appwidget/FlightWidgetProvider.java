@@ -6,9 +6,13 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.widget.RemoteViews;
 
 import com.udacity.nanodegree.advait.findmyflight.R;
+import com.udacity.nanodegree.advait.findmyflight.view.FlightActivity;
+import com.udacity.nanodegree.advait.findmyflight.view.FlightActivityFragment;
 import com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivity;
 
 /**
@@ -30,8 +34,15 @@ public class FlightWidgetProvider extends AppWidgetProvider {
             intentService.setAction("refresh");
             intentService.putExtra("widgetId", appWidgetId);
             context.startService(intentService);
-
-            Intent intent = new Intent(context, FlightDetailsActivity.class);
+            SharedPreferences preferences = context.getSharedPreferences("FlightNumber",
+                    Context.MODE_PRIVATE);
+            String flightIdent = preferences.getString("flightIdent", null);
+            Intent intent;
+            if (TextUtils.isEmpty(flightIdent)) {
+                intent = new Intent(context, FlightActivity.class);
+            } else {
+                intent = new Intent(context, FlightDetailsActivity.class);
+            }
             intent.putExtra("WidgetExtra", true);
 
             PendingIntent myPI = PendingIntent.getActivity(context, 0, intent, 0);

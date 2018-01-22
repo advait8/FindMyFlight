@@ -2,6 +2,7 @@ package com.udacity.nanodegree.advait.findmyflight.view;
 
 import android.content.CursorLoader;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -57,6 +58,7 @@ public class FlightActivityFragment extends Fragment {
     private FlightListAdapter flightListAdapter;
 
     ImageView clearButton;
+    private ArrayList flightList;
 
     public FlightActivityFragment() {
     }
@@ -96,6 +98,9 @@ public class FlightActivityFragment extends Fragment {
                             public void onError(Throwable e) {
                                 originCityText.setText("");
                                 destinationCityText.setText("");
+                                if (progressBar.getVisibility() == View.VISIBLE) {
+                                    progressBar.setVisibility(View.GONE);
+                                }
                                 Snackbar snackbar = Snackbar.make(FlightActivityFragment.this
                                                 .getView(), getString(R.string.api_error_generic_response),
                                         Snackbar.LENGTH_LONG);
@@ -130,14 +135,20 @@ public class FlightActivityFragment extends Fragment {
                 FirebaseAnalyticsHelper.setEvent(FirebaseAnalytics.Event.SEARCH, eventBundle, getContext());
             }
         });
-        ArrayList<Flight> listOfPastSearchedFlights = retrievePastClickedFLights();
-        title.setText(getString(R.string.recently_searched_flights));
-        title.setContentDescription(String.format(getString(R.string.cd_flight_list), getString(R
-                .string.recently_searched_flights)));
-        clearButton.setContentDescription(String.format(getString(R.string.cd_clear_list_button), getString(R
-                .string.recently_searched_flights)));
-        flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext(), recyclerView);
-        recyclerView.setAdapter(flightListAdapter);
+        if (flightList != null && !flightList.isEmpty()) {
+            flightListAdapter = new FlightListAdapter(flightList, getContext(), recyclerView);
+            recyclerView.setAdapter(flightListAdapter);
+        } else {
+            flightList = retrievePastClickedFLights();
+            title.setText(getString(R.string.recently_searched_flights));
+            title.setContentDescription(String.format(getString(R.string.cd_flight_list), getString(R
+                    .string.recently_searched_flights)));
+            clearButton.setContentDescription(String.format(getString(R.string.cd_clear_list_button), getString(R
+                    .string.recently_searched_flights)));
+            flightListAdapter = new FlightListAdapter(flightList, getContext(), recyclerView);
+            recyclerView.setAdapter(flightListAdapter);
+        }
+
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -167,7 +178,7 @@ public class FlightActivityFragment extends Fragment {
     }
 
     private void processFlightDetails(JsonObject flightInfoStatusData) throws JSONException {
-        List<Flight> flightList = new ArrayList<>();
+        flightList = new ArrayList<>();
         JsonObject findFlightResult = flightInfoStatusData.getAsJsonObject("FindFlightResult");
         title.setText(getString(R.string.search_results));
         title.setText(String.format(getString(R.string.cd_flight_list), getString(R.string.search_results)));
@@ -194,5 +205,21 @@ public class FlightActivityFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("flightList", flightList);
+        outState.putString("flightListTitle", title.getText().toString());
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            flightList = savedInstanceState.getParcelableArrayList("flightList");
+            title.setText(savedInstanceState.getString("flightListTitle"));
+        }
     }
 }
