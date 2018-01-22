@@ -132,6 +132,10 @@ public class FlightActivityFragment extends Fragment {
         });
         ArrayList<Flight> listOfPastSearchedFlights = retrievePastClickedFLights();
         title.setText(getString(R.string.recently_searched_flights));
+        title.setContentDescription(String.format(getString(R.string.cd_flight_list), getString(R
+                .string.recently_searched_flights)));
+        clearButton.setContentDescription(String.format(getString(R.string.cd_clear_list_button), getString(R
+                .string.recently_searched_flights)));
         flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext(), recyclerView);
         recyclerView.setAdapter(flightListAdapter);
         recyclerView.setHasFixedSize(true);
@@ -166,6 +170,9 @@ public class FlightActivityFragment extends Fragment {
         List<Flight> flightList = new ArrayList<>();
         JsonObject findFlightResult = flightInfoStatusData.getAsJsonObject("FindFlightResult");
         title.setText(getString(R.string.search_results));
+        title.setText(String.format(getString(R.string.cd_flight_list), getString(R.string.search_results)));
+        clearButton.setContentDescription(String.format(getString(R.string.cd_clear_list_button),
+                getString(R.string.search_results)));
         if (findFlightResult != null) {
             JsonArray flightArray = findFlightResult.getAsJsonArray("flights");
             for (int i = 0; i < flightArray.size(); i++) {

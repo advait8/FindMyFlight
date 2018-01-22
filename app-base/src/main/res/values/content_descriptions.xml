@@ -8,8 +8,9 @@
     <string name="cd_flight_list">List of %1$s</string>
     <string name="cd_clear_list_button">Click here to clear the list of %1$s</string>
     <string name="cd_flight_number">The flight %1$s is operated by %2$s</string>
+    <string name="cd_aircraft_type">Flight is operated using %1$s</string>
     <string name="cd_origin_airport">Flight departs from %1$s at %2$s</string>
-    <string name="cd_destination_airport">Flight arrives at %1$s at %2$s</string>
+    <string name="cd_destination_airport">Flight arrives %1$s at %2$s</string>
     <string name="cd_flight_status">The flight is currently %1$s</string>
     <string name="cd_start_track_flight_button">Click this button to start tracking the flight
         from widget</string>

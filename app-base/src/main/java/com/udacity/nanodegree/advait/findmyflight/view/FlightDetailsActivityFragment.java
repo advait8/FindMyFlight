@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.ads.AdRequest;
@@ -73,6 +74,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
 
     private AdView mAdView;
 
+    private LinearLayout originData, destinationData;
+
     public FlightDetailsActivityFragment() {
     }
 
@@ -105,6 +108,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         statusData = view.findViewById(R.id.statusData);
         fabButton = view.findViewById(R.id.fabButton);
         mAdView = view.findViewById(R.id.adView);
+        originData = view.findViewById(R.id.originComponent);
+        destinationData = view.findViewById(R.id.destinationData);
         return view;
     }
 
@@ -148,10 +153,22 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
                 redirectToGooglePlayStore();
             } else if (isBeingTracked) {
                 deleteData();
+                fabButton.setContentDescription(String.format(getString(R.string.cd_stop_track_flight_button)));
             } else {
                 storeData();
+                fabButton.setContentDescription(String.format(getString(R.string.cd_start_track_flight_button)));
             }
         });
+
+        originData.setContentDescription(String.format(getString(R.string.cd_origin_airport),
+                currentFlight.getFlightOrigin().getCity(), currentFlight.getFiledDepartureTime()
+                        .getTime() + "on" + currentFlight.getFiledDepartureTime().getDate()));
+        destinationData.setContentDescription(String.format(getString(R.string.cd_destination_airport),
+                currentFlight.getFlightDestination().getCity(), currentFlight.getEstimatedArrivalTime()
+                        .getTime() + " on " + currentFlight.getEstimatedArrivalTime().getDate()));
+        statusData.setContentDescription(String.format(getString(R.string.cd_flight_status),
+                currentFlight.getStatus()));
+
     }
 
     private void redirectToGooglePlayStore() {
@@ -232,6 +249,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
             @Override
             public void onError(Throwable e) {
                 aircraftType.setText(currentFlight.getAircraftType());
+                aircraftType.setContentDescription(String.format(getString(R.string
+                        .cd_aircraft_type), currentFlight.getAircraftType()));
                 Log.d("onError", e.getLocalizedMessage());
             }
 
@@ -243,6 +262,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
                         getAsJsonObject().get("type").getAsString();
                 aircraftType.setText(String.format(getString(R.string
                         .aircraft_manufacturer_and_model), manufacturer, type));
+                aircraftType.setContentDescription(String.format(getString(R.string
+                        .cd_aircraft_type), manufacturer + " " + type));
             }
         });
     }

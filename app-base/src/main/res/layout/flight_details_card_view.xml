@@ -37,10 +37,12 @@
             android:weightSum="2">
 
             <LinearLayout
+                android:id="@+id/originComponent"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="16dp"
                 android:layout_weight="1"
+                android:focusable="true"
                 android:orientation="vertical">
 
                 <TextView
@@ -77,16 +79,18 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/destinationData"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:focusable="true"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/destinationAirportCode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white" android:contentDescription="@string/cd_destination_airport_code" />
 
                 <TextView
                     android:id="@+id/destinationCity"
