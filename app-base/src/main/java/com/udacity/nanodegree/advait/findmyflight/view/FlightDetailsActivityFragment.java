@@ -19,6 +19,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.instantapps.InstantApps;
 import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
@@ -69,6 +71,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
 
     boolean isBeingTracked;
 
+    private AdView mAdView;
+
     public FlightDetailsActivityFragment() {
     }
 
@@ -82,7 +86,6 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
             Bundle bundle = getActivity().getIntent().getBundleExtra("FlightBundle");
             currentFlight = bundle.getParcelable("Flight");
         }
-
     }
 
     @Override
@@ -101,6 +104,7 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         arrivalDate = view.findViewById(R.id.arrivalDateData);
         statusData = view.findViewById(R.id.statusData);
         fabButton = view.findViewById(R.id.fabButton);
+        mAdView = view.findViewById(R.id.adView);
         return view;
     }
 
@@ -115,7 +119,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         if (currentFlight != null) {
             setupFlightView();
         }
-
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     private void setupFlightView() {

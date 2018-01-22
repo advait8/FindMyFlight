@@ -7,6 +7,7 @@
     <string name="flightaware_user_name" translatable="false">findmyflight1234</string>
     <string name="title_activity_flight_details">Flight Details</string>
     <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://findmyflight12345.herokuapp.com\",\n  }\n}]</string>
+    <string name="firebase_Admob_test_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>
     <string name="submit">Submit</string>
     <string name="origin">Origin</string>
     <string name="destination">Destination</string>
