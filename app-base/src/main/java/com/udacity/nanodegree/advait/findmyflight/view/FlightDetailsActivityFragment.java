@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import com.google.android.instantapps.InstantApps;
 import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
+import com.udacity.nanodegree.advait.findmyflight.analytics.FirebaseAnalyticsHelper;
 import com.udacity.nanodegree.advait.findmyflight.model.Airline;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.model.FlightInfoStatusData;
@@ -65,6 +67,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
 
     FloatingActionButton fabButton;
 
+    boolean isBeingTracked;
+
     public FlightDetailsActivityFragment() {
     }
 
@@ -78,6 +82,7 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
             Bundle bundle = getActivity().getIntent().getBundleExtra("FlightBundle");
             currentFlight = bundle.getParcelable("Flight");
         }
+
     }
 
     @Override
@@ -102,6 +107,11 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
     @Override
     public void onResume() {
         super.onResume();
+        SharedPreferences preferences = getContext().getSharedPreferences("FlightNumber", MODE_PRIVATE);
+        String flightIdent = preferences.getString("flightIdent", null);
+        if (!TextUtils.isEmpty(flightIdent) && flightIdent.equalsIgnoreCase(currentFlight.getFaFlightId())) {
+            isBeingTracked = true;
+        }
         if (currentFlight != null) {
             setupFlightView();
         }
@@ -131,6 +141,8 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         fabButton.setOnClickListener(view -> {
             if (InstantApps.isInstantApp(getContext())) {
                 redirectToGooglePlayStore();
+            } else if (isBeingTracked) {
+                deleteData();
             } else {
                 storeData();
             }
@@ -144,9 +156,25 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
     }
 
     private void storeData() {
+        Bundle eventBundle = new Bundle();
         SharedPreferences preferences = getActivity().getSharedPreferences("FlightNumber", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("flightIdent", currentFlight.getFaFlightId()).commit();
+        editor.putString("flightIdent", currentFlight.getFaFlightId()).apply();
+        isBeingTracked = true;
+        fabButton.setImageDrawable(ContextCompat.getDrawable(getContext(), android.R.drawable.ic_delete));
+        eventBundle.putString("FindMyFlight", getString(R.string.fbase_event_start_flight_track));
+        FirebaseAnalyticsHelper.setEvent("FlightDetails", eventBundle, getContext());
+    }
+
+    private void deleteData() {
+        Bundle eventBundle = new Bundle();
+        SharedPreferences preferences = getActivity().getSharedPreferences("FlightNumber", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("flightIdent", null).apply();
+        isBeingTracked = false;
+        fabButton.setImageDrawable(ContextCompat.getDrawable(getContext(), android.R.drawable.ic_input_add));
+        eventBundle.putString("FindMyFlight", getString(R.string.fbase_event_stop_tracking_flight));
+        FirebaseAnalyticsHelper.setEvent("FlightDetails", eventBundle, getContext());
     }
 
     private void findAirlineDetails(String icaoCode, Context context) {
@@ -166,15 +194,24 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
             @Override
             public void onError(Throwable e) {
                 currentAirline = null;
-                flightNumber.setText(currentFlight.getAirline()+ " "+"\n(" + currentFlight
-                        .getIdent() + ")");
+                flightNumber.setText(String.format(getString(R.string
+                        .airline_name_and_flight_number), currentFlight.getAirline(), currentFlight
+                        .getIdent()));
+                flightNumber.setContentDescription(String.format(getString(R.string.cd_flight_number),
+                        currentFlight.getIdent(), currentFlight.getAirline()));
                 Log.d("onError", e.getLocalizedMessage());
             }
 
             @Override
             public void onNext(Airline airline) {
                 currentAirline = airline;
-                flightNumber.setText(currentAirline.getName() + " " + "\n(" + currentAirline.getIataCode() + currentFlight.getFlightNumber() + ")");
+                flightNumber.setText(String.format(getString(R.string
+                        .airline_name_and_flight_number), currentAirline.getName(), currentAirline
+                        .getIataCode() +
+                        currentFlight.getFlightNumber()));
+                flightNumber.setContentDescription(String.format(getString(R.string.cd_flight_number),
+                        currentAirline.getIataCode() + currentFlight.getFlightNumber(),
+                        currentAirline.getName()));
             }
         });
     }
@@ -189,17 +226,18 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
 
             @Override
             public void onError(Throwable e) {
-                aircraftType.setText(" ");
+                aircraftType.setText(currentFlight.getAircraftType());
                 Log.d("onError", e.getLocalizedMessage());
             }
 
             @Override
             public void onNext(JsonObject jsonObject) {
-                aircraftType.setText(
-                        jsonObject.get("AircraftTypeResult").
-                                getAsJsonObject().get("manufacturer").getAsString()
-                                + " " + jsonObject.get("AircraftTypeResult").
-                                getAsJsonObject().get("type").getAsString());
+                String manufacturer = jsonObject.get("AircraftTypeResult").
+                        getAsJsonObject().get("manufacturer").getAsString();
+                String type = jsonObject.get("AircraftTypeResult").
+                        getAsJsonObject().get("type").getAsString();
+                aircraftType.setText(String.format(getString(R.string
+                        .aircraft_manufacturer_and_model), manufacturer, type));
             }
         });
     }
@@ -227,7 +265,7 @@ public class FlightDetailsActivityFragment extends Fragment implements LoaderMan
         Flight tempFlight;
         FlightDetailsActivityFragment fragment;
 
-        public FetchData(Context context, FlightDetailsActivityFragment fragment) {
+        private FetchData(Context context, FlightDetailsActivityFragment fragment) {
             super(context);
             this.fragment = fragment;
         }

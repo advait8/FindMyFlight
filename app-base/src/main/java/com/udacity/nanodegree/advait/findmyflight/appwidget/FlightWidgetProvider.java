@@ -33,6 +33,7 @@ public class FlightWidgetProvider extends AppWidgetProvider {
 
             Intent intent = new Intent(context, FlightDetailsActivity.class);
             intent.putExtra("WidgetExtra", true);
+
             PendingIntent myPI = PendingIntent.getActivity(context, 0, intent, 0);
             remoteViews.setOnClickPendingIntent(R.id.flightWidget, myPI);
             appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);

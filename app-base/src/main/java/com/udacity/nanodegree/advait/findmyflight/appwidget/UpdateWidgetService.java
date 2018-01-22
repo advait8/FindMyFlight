@@ -39,8 +39,6 @@ public class UpdateWidgetService extends IntentService {
 
     private static final String TAG = UpdateWidgetService.class.getSimpleName();
 
-    String currentFlightFaId = null;
-
     public UpdateWidgetService(){
         super("UpdateWidgetService");
     }
@@ -51,7 +49,6 @@ public class UpdateWidgetService extends IntentService {
 
     private void updateAppWidget(int incomingAppWidgetId) {
         SharedPreferences preferences = getSharedPreferences("FlightNumber", MODE_PRIVATE);
-
         String flightIdent = preferences.getString("flightIdent", null);
         if (!TextUtils.isEmpty(flightIdent)) {
             findFlightDetails(flightIdent, incomingAppWidgetId);

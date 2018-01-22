@@ -17,10 +17,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
 import com.udacity.nanodegree.advait.findmyflight.adapter.FlightListAdapter;
+import com.udacity.nanodegree.advait.findmyflight.analytics.FirebaseAnalyticsHelper;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.persistence.FlightDataContentProvider;
 import com.udacity.nanodegree.advait.findmyflight.service.FlightAwareService;
@@ -110,20 +112,26 @@ public class FlightActivityFragment extends Fragment {
                             }
                         });
             }
+            Bundle eventBundle = new Bundle();
+            eventBundle.putString("FindMyFlight", getString(R.string.fbase_event_search_flights));
+            FirebaseAnalyticsHelper.setEvent(FirebaseAnalytics.Event.SEARCH, eventBundle, getContext());
         });
 
-        clearButton.setOnClickListener(new View.OnClickListener(){
+        clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getContext().getContentResolver().delete(FlightDataContentProvider.CONTENT_URI,
-                        null,null);
+                        null, null);
                 ArrayList<Flight> listOfPastSearchedFlights = retrievePastClickedFLights();
                 flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext(), recyclerView);
                 recyclerView.setAdapter(flightListAdapter);
+                Bundle eventBundle = new Bundle();
+                eventBundle.putString("FindMyFlight", getString(R.string.fbase_event_clear_flight_list));
+                FirebaseAnalyticsHelper.setEvent(FirebaseAnalytics.Event.SEARCH, eventBundle, getContext());
             }
         });
         ArrayList<Flight> listOfPastSearchedFlights = retrievePastClickedFLights();
-        title.setText("Recently searched flights");
+        title.setText(getString(R.string.recently_searched_flights));
         flightListAdapter = new FlightListAdapter(listOfPastSearchedFlights, getContext(), recyclerView);
         recyclerView.setAdapter(flightListAdapter);
         recyclerView.setHasFixedSize(true);
@@ -157,7 +165,7 @@ public class FlightActivityFragment extends Fragment {
     private void processFlightDetails(JsonObject flightInfoStatusData) throws JSONException {
         List<Flight> flightList = new ArrayList<>();
         JsonObject findFlightResult = flightInfoStatusData.getAsJsonObject("FindFlightResult");
-        title.setText("Search results");
+        title.setText(getString(R.string.search_results));
         if (findFlightResult != null) {
             JsonArray flightArray = findFlightResult.getAsJsonArray("flights");
             for (int i = 0; i < flightArray.size(); i++) {

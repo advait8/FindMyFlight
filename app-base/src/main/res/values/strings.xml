@@ -1,31 +1,32 @@
 <resources>
-    <string name="app_name">FindMyFlight</string>
+    <string name="app_name">Find My Flight</string>
     <string name="title_activity_flight">FlightActivity</string>
     <string name="action_settings">Settings</string>
     <string name="google_web_client_id" translatable="false">1031273598701-4nsecg5d7r4pc7s08nljmdrm4sn3n9b1.apps.googleusercontent.com</string>
     <string name="flightaware_api_key" translatable="false">7917cbbea516561ff2c84a58f04106b7d2ad8655</string>
     <string name="flightaware_user_name" translatable="false">findmyflight1234</string>
-    <string name="title_activity_flight_details">FlightDetailsActivity</string>
+    <string name="title_activity_flight_details">Flight Details</string>
     <string name="asset_statements" translatable="false">[{\n  \"relation\": [\"delegate_permission/common.handle_all_urls\"],\n  \"target\": {\n    \"namespace\": \"web\",\n    \"site\": \"https://findmyflight12345.herokuapp.com\",\n  }\n}]</string>
     <string name="submit">Submit</string>
     <string name="origin">Origin</string>
     <string name="destination">Destination</string>
     <string name="for_example_jfk">For example JFK</string>
     <string name="for_example_lhr">For example LHR</string>
-    <string name="flightNumberHint">American Airlines # 101</string>
-    <string name="aircraftTypeHint">Airbus A321</string>
-    <string name="airportCodeHint">CLT</string>
-    <string name="airportNameHintText">Charlotte-Douglas Intl. Airport</string>
     <string name="departureTime">Departure Time</string>
-    <string name="departureTimeHintText">9:45 PM EST</string>
-    <string name="departureDateHintText">10/22/2017</string>
-    <string name="arrivalAirportCode">JFK</string>
-    <string name="arrivalAirportName">John F Kennedy Intl. Airport</string>
     <string name="arrivalTime">Arrival Time</string>
-    <string name="arrivalTimeHintText">11:30 PM EST</string>
-    <string name="arrivalDateHintText">10/22/2017</string>
     <string name="flightStatus">Status</string>
     <string name="flightStatusHintText">On Time</string>
     <string name="no_flights_found">No flights found</string>
     <string name="api_error_generic_response">There was a problem with our service. Please try again later.</string>
+    <string name="origin_airport">Origin Airport</string>
+    <string name="origin_airport_hint_text">For example JFK</string>
+    <string name="destination_airport">Destination Airport</string>
+    <string name="destination_airport_hint_text">For example LHR</string>
+    <string name="search_button_text">Search</string>
+    <string name="recycler_view_title_text">Recycler View Title</string>
+
+    <string name="airline_name_and_flight_number">%1$s : %2$s</string>
+    <string name="aircraft_manufacturer_and_model">%1$s %2$s</string>
+    <string name="recently_searched_flights">Recently searched flights</string>
+    <string name="search_results">Search results</string>
 </resources>

@@ -15,8 +15,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.JsonObject;
 import com.udacity.nanodegree.advait.findmyflight.R;
+import com.udacity.nanodegree.advait.findmyflight.analytics.FirebaseAnalyticsHelper;
 import com.udacity.nanodegree.advait.findmyflight.model.Flight;
 import com.udacity.nanodegree.advait.findmyflight.model.FlightInfoStatusData;
 import com.udacity.nanodegree.advait.findmyflight.persistence.FlightDataContentProvider;
@@ -92,6 +94,8 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
         @Override
         public void onClick(View view) {
             Flight flightClicked = flightList.get(getLayoutPosition());
+            Bundle eventBundle = new Bundle();
+
             if (flightClicked.isRestoredFromDB()) {
                 if (progressBar != null) {
                     progressBar.setVisibility(View.VISIBLE);
@@ -110,6 +114,8 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
 
                     @Override
                     public void onError(Throwable e) {
+                        eventBundle.putString("FindMyFlight", context.getString(R.string.fbase_event_recent_flight_click_error));
+                        FirebaseAnalyticsHelper.setEvent("FlightList", eventBundle, context);
                         Snackbar snackbar = Snackbar.make(recyclerView, context.getString(R.string
                                         .api_error_generic_response),
                                 Snackbar.LENGTH_LONG);
@@ -126,15 +132,21 @@ public class FlightListAdapter extends RecyclerView.Adapter<FlightListAdapter.Vi
                         bundle.putParcelable("Flight", updatedFlight);
                         intent.putExtra("FlightBundle", bundle);
                         context.startActivity(intent);
-                        Log.d("UpdateWidgetService", "Widget updated");
+                        eventBundle.putString("FindMyFlight", context.getString(R.string
+                                .fbase_event_recently_search_flight));
+                        FirebaseAnalyticsHelper.setEvent("FlightList", eventBundle, context);
                     }
                 });
+
             } else {
                 addFlightToDb(flightClicked);
                 Intent intent = new Intent(context, FlightDetailsActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("Flight", flightClicked);
                 intent.putExtra("FlightBundle", bundle);
+                eventBundle.putString("FindMyFlight", context.getString(R.string
+                        .fbase_event_newly_searched_flight));
+                FirebaseAnalyticsHelper.setEvent("FlightList", eventBundle, context);
                 context.startActivity(intent);
             }
 

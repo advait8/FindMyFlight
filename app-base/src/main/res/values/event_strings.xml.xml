@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fbase_event_recent_flight_click_error" translatable="false">recently searched
+        flight clicked error</string>
+    <string name="fbase_event_start_flight_track" translatable="false">track flight from widget</string>
+    <string name="fbase_event_stop_tracking_flight" translatable="false">stop tracking flight from widget</string>
+    <string name="fbase_event_search_flights" translatable="false">flightSearch</string>
+    <string name="fbase_event_clear_flight_list" translatable="false">clearSearch</string>
+    <string name="fbase_event_recently_search_flight" translatable="false">recently searched flight</string>
+    <string name="fbase_event_newly_searched_flight" translatable="false">newly searched flight</string>
+</resources>

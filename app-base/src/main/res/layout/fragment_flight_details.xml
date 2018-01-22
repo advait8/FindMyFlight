@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/app_background"
     tools:context="com.udacity.nanodegree.advait.findmyflight.view.FlightDetailsActivityFragment"
-    tools:showIn="@layout/activity_flight_details" android:background="@drawable/app_background">
+    tools:showIn="@layout/activity_flight_details" android:padding="16dp">
     <include layout="@layout/flight_details_card_view" />
 </android.support.constraint.ConstraintLayout>
